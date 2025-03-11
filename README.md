@@ -21,7 +21,7 @@ A REST API for managing hospital activities involving Doctors, Patients, Assista
 ### Installation Steps
 1. Clone this repository
    ```
-   git clone 
+   git clone https://github.com/Apostu0Alexandru/MedAPI-Hospital-Management-System-REST-API
    cd hospital_management
    ```
 
@@ -68,6 +68,93 @@ Interactive API documentation is available at:
 - Swagger UI: `/swagger/`
 - ReDoc: `/redoc/`
 
+## Testing the API
+
+### 1. Using curl
+
+First, obtain an authentication token:
+
+```bash
+# Login to get token
+curl -X POST http://localhost:8000/api/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username":"manager", "password":"manager123"}'
+```
+
+Then use the token to access other endpoints:
+
+#### Doctor Endpoints
+```bash
+# List all doctors
+curl -X GET http://localhost:8000/api/doctors/ \
+  -H "Authorization: Token YOUR_TOKEN_HERE"
+
+# Create a new doctor
+curl -X POST http://localhost:8000/api/doctors/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token YOUR_TOKEN_HERE" \
+  -d '{"username":"doctor1", "password":"doctor123", "first_name":"John", "last_name":"Smith", "role":"DR"}'
+```
+
+#### Patient Endpoints
+```bash
+# List all patients
+curl -X GET http://localhost:8000/api/patients/ \
+  -H "Authorization: Token YOUR_TOKEN_HERE"
+
+# Create a new patient
+curl -X POST http://localhost:8000/api/patients/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token YOUR_TOKEN_HERE" \
+  -d '{"first_name":"Jane", "last_name":"Doe", "age":"29", "address":"123 Main St", "mobile":"5551234567"}'
+```
+
+#### Assistant Endpoints
+```bash
+# List all assistants
+curl -X GET http://localhost:8000/api/assistants/ \
+  -H "Authorization: Token YOUR_TOKEN_HERE"
+```
+
+#### Treatment Endpoints
+```bash
+# List all treatments
+curl -X GET http://localhost:8000/api/treatments/ \
+  -H "Authorization: Token YOUR_TOKEN_HERE"
+```
+
+#### Patient Assignments
+```bash
+# Assign patient to assistant
+curl -X POST http://localhost:8000/api/patient-assignments/ \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Token YOUR_TOKEN_HERE" \
+  -d '{"patient":1, "assistant":1}'
+```
+
+#### Reports
+```bash
+# Get doctor-patient report
+curl -X GET http://localhost:8000/api/reports/doctors-patients/ \
+  -H "Authorization: Token YOUR_TOKEN_HERE"
+```
+
+### 2. Using Postman
+
+1. Download and install [Postman](https://www.postman.com/downloads/)
+2. Create a new request:
+   - Set the HTTP method (GET, POST, PUT, DELETE)
+   - Enter the URL (e.g., http://localhost:8000/api/doctors/)
+   - Add header: `Authorization: Token YOUR_TOKEN_HERE`
+   - For POST/PUT requests, add JSON body in the "Body" tab
+
+### 3. Using Swagger UI
+
+1. Start the server: `python manage.py runserver`
+2. Navigate to http://localhost:8000/swagger/
+3. Authenticate by clicking "Authorize" and entering your token
+4. Use the interactive documentation to test all endpoints
+
 ## API Endpoints
 
 ### Authentication
@@ -103,29 +190,7 @@ Interactive API documentation is available at:
 - GET `/api/reports/doctors-patients/` - Doctors and patients report (GM)
 - GET `/api/reports/patient-treatments/{id}/` - Patient treatments report (GM/Doctor)
 
-## Authentication
-
-The API uses token-based authentication. To authenticate:
-
-1. Obtain a token by sending a POST request to `/api/login/` with your credentials:
-   ```
-   {
-       "username": "manager",
-       "password": "manager123"
-   }
-   ```
-
-2. Include the token in the `Authorization` header of your requests:
-   ```
-   Authorization: Token 
-   ```
-
-## User Roles
-
-1. **General Manager (GM)**: Has access to all endpoints and operations.
-2. **Doctor (DR)**: Has access to their patients and can recommend treatments.
-3. **Assistant (AS)**: Has access to assigned patients and can apply treatments.
-
 ## Live Demo
 
 The API is deployed at [https://medapi-hospital-management-system-rest.onrender.com](https://medapi-hospital-management-system-rest.onrender.com)
+
