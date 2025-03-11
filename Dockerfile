@@ -17,6 +17,7 @@ COPY . .
 EXPOSE 8000
 
 # Run migrations and collect static files during build (optional)
+RUN mkdir -p /app/staticfiles && chmod 755 /app/staticfiles
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
 

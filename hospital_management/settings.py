@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "hospital",
-    'rest_framework.authtoken',  # Make sure this appears only once
+    'rest_framework.authtoken',
+    'drf_yasg',  # Make sure this appears only once
 ]
 
 MIDDLEWARE = [
