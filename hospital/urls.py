@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from . import views
 from .views import LoginView
 from drf_yasg.views import get_schema_view
+from rest_framework import permissions
 from drf_yasg import openapi
 
 router = DefaultRouter()

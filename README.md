@@ -96,8 +96,8 @@ Interactive API documentation is available at:
 - GET, POST `/api/treatment-applications/` - List or apply treatments
 
 ### Patient Assignment (Doctor or GM)
-- POST `/api/patient-assignment/` - Assign patient to assistant
-- DELETE `/api/patient-assignment/` - Remove patient from assistant
+- POST `/api/patient-assignments/` - Assign patient to assistant
+- DELETE `/api/patient-assignments/` - Remove patient from assistant
 
 ### Reports
 - GET `/api/reports/doctors-patients/` - Doctors and patients report (GM)
