@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app  # Mount the current directory into the container
+      - ./db.sqlite3:/app/db.sqlite3
+      - ./staticfiles:/app/staticfiles  # Map local staticfiles directory to container  # Ensure SQLite database persists locally
+    environment:
+      DEBUG: "1"
