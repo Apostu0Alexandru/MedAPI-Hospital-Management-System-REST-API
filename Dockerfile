@@ -18,11 +18,10 @@ EXPOSE 8000
 
 # Run migrations and collect static files during build (optional)
 RUN mkdir -p /app/staticfiles && chmod 755 /app/staticfiles
+ENV DJANGO_SECRET_KEY="django-insecure-%2s$xlbw77$x*%)cqrh-a6*1!k9==fw@i0!hz4ahr$27ota2*q"
 RUN python manage.py migrate
 RUN python manage.py collectstatic --noinput
 
-ENV DJANGO_SECRET_KEY="django-insecure-%2s$xlbw77$x*%)cqrh-a6*1!k9==fw@i0!hz4ahr$27ota2*q"
-ENV DEBUG=False
 
 # Run the application using Gunicorn
 CMD ["gunicorn", "hospital_management.wsgi:application", "--bind", "0.0.0.0:8000"]
