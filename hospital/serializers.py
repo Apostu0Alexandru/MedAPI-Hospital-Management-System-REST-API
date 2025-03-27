@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class DoctorSerializer(serializers.ModelSerializer):
     user = UserSerializer()
-    assistants = serializers.PrimaryKeyRelatedField(many=True, read_only=True, queryset=Assistant.objects.all())
+    assistants = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
     
     class Meta:
         model = Doctor

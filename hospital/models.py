@@ -69,11 +69,18 @@ class TreatmentApplication(models.Model):
     ]
     
     assistant = models.ForeignKey(Assistant, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, null=True, blank=True)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
     application_date = models.DateField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='PE')
     notes = models.TextField(blank=True)
+    
+    def clean(self):
+        # Validate that the assistant is assigned to the doctor
+        if self.doctor and self.assistant and not self.doctor.assistants.filter(id=self.assistant.id).exists():
+            from django.core.exceptions import ValidationError
+            raise ValidationError("This assistant is not assigned to the doctor")
     
     def __str__(self):
         return f"{self.treatment.name} for {self.patient} by {self.assistant}"
