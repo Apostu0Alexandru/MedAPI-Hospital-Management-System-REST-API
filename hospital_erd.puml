@@ -63,6 +63,7 @@ class TreatmentRecommendation {
 class TreatmentApplication {
     + id: int <<PK>>
     + assistant_id: int <<FK>>
+    + doctor_id: int <<FK>>
     + patient_id: int <<FK>>
     + treatment_id: int <<FK>>
     + application_date: date
@@ -83,12 +84,14 @@ User "1" -- "1" Token : has
 
 Doctor "*" -- "*" Patient : treats
 Assistant "*" -- "*" Patient : assists
+Doctor "*" -- "*" Assistant : has
 
 Doctor "1" -- "*" TreatmentRecommendation : creates
 Patient "1" -- "*" TreatmentRecommendation : receives
 Treatment "1" -- "*" TreatmentRecommendation : is_recommended
 
 Assistant "1" -- "*" TreatmentApplication : performs
+Doctor "1" -- "*" TreatmentApplication : supervises
 Patient "1" -- "*" TreatmentApplication : receives
 Treatment "1" -- "*" TreatmentApplication : is_applied
 
