@@ -1,0 +1,101 @@
+@startuml Hospital Management System ERD
+
+' Style settings
+skinparam class {
+    BackgroundColor LightBlue
+    ArrowColor Black
+    BorderColor Black
+}
+
+' Base User class
+class User {
+    + id: int <<PK>>
+    + username: string
+    + first_name: string
+    + last_name: string
+    + email: string
+    + role: enum [GM, DR, AS]
+    + password: string
+    + is_active: boolean
+    + is_staff: boolean
+    + date_joined: datetime
+}
+
+class Doctor {
+    + id: int <<PK>>
+    + user_id: int <<FK>>
+    + specialization: string
+    + department: string
+}
+
+class Assistant {
+    + id: int <<PK>>
+    + user_id: int <<FK>>
+    + department: string
+}
+
+class Patient {
+    + id: int <<PK>>
+    + first_name: string
+    + last_name: string
+    + date_of_birth: date
+    + address: text
+    + phone_number: string
+    + medical_history: text
+}
+
+class Treatment {
+    + id: int <<PK>>
+    + name: string
+    + description: text
+    + cost: decimal(10,2)
+}
+
+class TreatmentRecommendation {
+    + id: int <<PK>>
+    + doctor_id: int <<FK>>
+    + patient_id: int <<FK>>
+    + treatment_id: int <<FK>>
+    + recommendation_date: date
+    + notes: text
+}
+
+class TreatmentApplication {
+    + id: int <<PK>>
+    + assistant_id: int <<FK>>
+    + patient_id: int <<FK>>
+    + treatment_id: int <<FK>>
+    + application_date: date
+    + status: enum [PE, IP, CO]
+    + notes: text
+}
+
+class Token {
+    + key: string <<PK>>
+    + user_id: int <<FK>>
+    + created: datetime
+}
+
+' Relationships with cardinality
+User "1" -- "0..1" Doctor : has
+User "1" -- "0..1" Assistant : has
+User "1" -- "1" Token : has
+
+Doctor "*" -- "*" Patient : treats
+Assistant "*" -- "*" Patient : assists
+
+Doctor "1" -- "*" TreatmentRecommendation : creates
+Patient "1" -- "*" TreatmentRecommendation : receives
+Treatment "1" -- "*" TreatmentRecommendation : is_recommended
+
+Assistant "1" -- "*" TreatmentApplication : performs
+Patient "1" -- "*" TreatmentApplication : receives
+Treatment "1" -- "*" TreatmentApplication : is_applied
+
+note "PE = Pending\nIP = In Progress\nCO = Completed" as N1
+TreatmentApplication .. N1
+
+note "GM = General Manager\nDR = Doctor\nAS = Assistant" as N2
+User .. N2
+
+@enduml 

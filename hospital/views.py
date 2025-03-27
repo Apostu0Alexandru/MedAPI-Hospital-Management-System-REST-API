@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, status
+from rest_framework import viewsets, generics, status, serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -6,9 +6,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
-
-
-
+from django.db import models
+from django.core.exceptions import ValidationError
 
 from .models import Doctor, Assistant, Patient, Treatment, TreatmentRecommendation, TreatmentApplication
 from .serializers import (DoctorSerializer, AssistantSerializer, PatientSerializer,
@@ -193,3 +192,80 @@ class PatientTreatmentsReportView(APIView):
             'recommendations': TreatmentRecommendationSerializer(recommendations, many=True).data,
             'applications': TreatmentApplicationSerializer(applications, many=True).data
         })
+
+class DoctorAssistantAssignmentView(APIView):
+    permission_classes = [IsGeneralManager]
+    
+    def post(self, request, doctor_id):
+        doctor = get_object_or_404(Doctor, id=doctor_id)
+        assistant_id = request.data.get('assistant_id')
+        assistant = get_object_or_404(Assistant, id=assistant_id)
+        
+        # Check if assistant is already assigned to the doctor
+        if assistant in doctor.assistants.all():
+            return Response(
+                {'error': 'Assistant is already assigned to this doctor'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        doctor.assistants.add(assistant)
+        return Response({
+            'message': 'Assistant assigned to doctor successfully',
+            'doctor': DoctorSerializer(doctor).data
+        })
+    
+    def delete(self, request, doctor_id):
+        doctor = get_object_or_404(Doctor, id=doctor_id)
+        assistant_id = request.data.get('assistant_id')
+        assistant = get_object_or_404(Assistant, id=assistant_id)
+        
+        if assistant not in doctor.assistants.all():
+            return Response(
+                {'error': 'Assistant is not assigned to this doctor'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        doctor.assistants.remove(assistant)
+        return Response({
+            'message': 'Assistant removed from doctor successfully',
+            'doctor': DoctorSerializer(doctor).data
+        })
+
+# Update the TreatmentApplication model to include doctor validation
+class TreatmentApplication(models.Model):
+    STATUS_CHOICES = [
+        ('PE', 'Pending'),
+        ('IP', 'In Progress'),
+        ('CO', 'Completed'),
+    ]
+    
+    assistant = models.ForeignKey(Assistant, on_delete=models.CASCADE)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)  # Added doctor field
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    treatment = models.ForeignKey(Treatment, on_delete=models.CASCADE)
+    application_date = models.DateField(auto_now_add=True)
+    status = models.CharField(max_length=2, choices=STATUS_CHOICES, default='PE')
+    notes = models.TextField(blank=True)
+    
+    def clean(self):
+        # Validate that the assistant is assigned to the doctor
+        if not self.doctor.assistants.filter(id=self.assistant.id).exists():
+            raise ValidationError("This assistant is not assigned to the doctor")
+    
+    def __str__(self):
+        return f"{self.treatment.name} for {self.patient} by {self.assistant}"
+
+# Update TreatmentApplicationSerializer
+class TreatmentApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TreatmentApplication
+        fields = ['id', 'assistant', 'doctor', 'patient', 'treatment', 
+                 'application_date', 'status', 'notes']
+    
+    def validate(self, data):
+        # Validate that the assistant is assigned to the doctor
+        if not data['doctor'].assistants.filter(id=data['assistant'].id).exists():
+            raise serializers.ValidationError(
+                "This assistant is not assigned to the doctor"
+            )
+        return data

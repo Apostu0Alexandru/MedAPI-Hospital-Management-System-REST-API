@@ -17,10 +17,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class DoctorSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    assistants = serializers.PrimaryKeyRelatedField(many=True, read_only=True, queryset=Assistant.objects.all())
     
     class Meta:
         model = Doctor
-        fields = ['id', 'user', 'specialization', 'department']
+        fields = ['id', 'user', 'specialization', 'department', 'assistants']
     
     def create(self, validated_data):
         user_data = validated_data.pop('user')
@@ -33,10 +34,11 @@ class DoctorSerializer(serializers.ModelSerializer):
 
 class AssistantSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    assigned_doctors = DoctorSerializer(many=True, read_only=True)
     
     class Meta:
         model = Assistant
-        fields = ['id', 'user', 'department']
+        fields = ['id', 'user', 'department', 'assigned_doctors']
     
     def create(self, validated_data):
         user_data = validated_data.pop('user')

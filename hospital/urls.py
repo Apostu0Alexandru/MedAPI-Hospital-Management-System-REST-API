@@ -30,8 +30,9 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', include(router.urls)),
     path('login/', LoginView.as_view(), name='login'),
-    path('patient-assignments/', views.PatientAssignmentView.as_view(), name='patient-assignments'),
-    path('reports/doctors-patients/', views.DoctorPatientsReportView.as_view(), name='doctors-patients-report'),
+    path('patient-assignment/', views.PatientAssignmentView.as_view(), name='patient-assignment'),
+    path('doctor-assistant-assignment/<int:doctor_id>/', views.DoctorAssistantAssignmentView.as_view(), name='doctor-assistant-assignment'),
+    path('reports/doctors/', views.DoctorPatientsReportView.as_view(), name='doctor-patients-report'),
     path('reports/patient-treatments/<int:patient_id>/', views.PatientTreatmentsReportView.as_view(), name='patient-treatments-report'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),

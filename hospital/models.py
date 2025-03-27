@@ -17,6 +17,7 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     specialization = models.CharField(max_length=100)
     department = models.CharField(max_length=100)
+    assistants = models.ManyToManyField('Assistant', related_name='assigned_doctors', blank=True)
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.specialization})"
@@ -24,6 +25,7 @@ class Doctor(models.Model):
 class Assistant(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     department = models.CharField(max_length=100)
+    # The reverse relationship is handled by the Doctor model
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name}"
